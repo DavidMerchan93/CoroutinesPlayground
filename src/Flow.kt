@@ -4,7 +4,73 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 
 fun main() {
-    flatMapLatest()
+    combineOperator()
+}
+
+private fun zipOperator() {
+
+    val letters = flow {
+        emit("A")
+        delay(200)
+        emit("B")
+        delay(200)
+        emit("C")
+        delay(200)
+        emit("D")
+    }
+
+    val numbers = flow {
+        emit(1)
+        delay(400)
+        emit(2)
+        delay(400)
+        emit(3)
+        delay(400)
+    }
+
+    val colors = flowOf("Amarillo", "Azul", "Rojo", "Verde")
+
+    runBlocking {
+        letters.zip(numbers) { l, n ->
+            "Letter: $l, Number: $n"
+        }.zip(colors) { r, c ->
+            "$r -> $c"
+        }.collect { result ->
+            println(result)
+        }
+    }
+}
+
+private fun combineOperator() {
+
+    val letters = flow {
+        emit("A")
+        emit("B")
+        emit("C")
+        emit("D")
+        emit("E")
+    }
+
+    val numbers = flow {
+        emit(1)
+        delay(200)
+        emit(2)
+        delay(100)
+        emit(3)
+        delay(1000)
+    }
+
+    val colors = flowOf("Amarillo", "Azul", "Rojo", "Verde")
+
+    runBlocking {
+        letters.combine(numbers) { l, n ->
+            "Letter: $l, Number: $n"
+        }.combine(colors) { r, c ->
+            "$r -> $c"
+        }.collect { result ->
+            println(result)
+        }
+    }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -52,8 +118,8 @@ private fun reduceOperator() {
         val colors = DataSource.getColorsFlow()
             .map { it.name }
             .reduce { acc, color ->
-            "$acc + $color"
-        }
+                "$acc + $color"
+            }
         println(colors)
     }
 }
