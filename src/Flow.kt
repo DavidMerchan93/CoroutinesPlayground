@@ -3,6 +3,52 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 
 fun main() {
+    singleOperator()
+}
+
+/**
+ * The `reduce` operator combines all the elements emitted by the flow into a single value
+ * using a specified accumulator function.
+ */
+private fun reduceOperator() {
+    runBlocking {
+        println("---------------  REDUCE  -----------------")
+        val colors = DataSource.getColorsFlow()
+            .map { it.name }
+            .reduce { acc, color ->
+            "$acc + $color"
+        }
+        println(colors)
+    }
+}
+
+/**
+ * The `fold` operator combines all the elements emitted by the flow into a single value
+ * using a specified accumulator function but with an initial values.
+ */
+private fun foldOperator() {
+    runBlocking {
+        println("---------------  FOLD  -----------------")
+        val colors = DataSource.getColorsFlow()
+            .map { it.name }
+            .fold("Valor inicial: ") { acc, color ->
+                "$acc + $color"
+            }
+        println(colors)
+    }
+}
+
+private fun singleOperator() {
+    runBlocking {
+        println("---------------  SINGLE  -----------------")
+        val color = DataSource.getColorsFlow()
+            .filter { it.name.contains("Blue") }
+            .single()
+        println(color)
+    }
+}
+
+private fun mapOperator() {
     runBlocking {
         println("---------------  MAP  -----------------")
         DataSource.getColorsFlow().map {
@@ -10,26 +56,37 @@ fun main() {
         }.collect { color ->
             println(color)
         }
+    }
+}
 
+private fun filterOperator() {
+    runBlocking {
         println("---------------  FILTER  -----------------")
         DataSource.getColorsFlow().filter {
             it.isPrimary
         }.collect { color ->
             println(color)
         }
+    }
+}
 
+private fun filterNotOperator() {
+    runBlocking {
         println("---------------  FILTER NOT  -----------------")
         DataSource.getColorsFlow().filterNot {
             it.isPrimary
         }.collect { color ->
             println(color)
         }
+    }
+}
 
-        // Tiene un metodo emit, para enviar el objeto transformado
-        // al flujo original, sin cambiarlo.
-        // Este metodo puede ser util cuando se quiere mantener el estado
-        // de los objetos en el flujo original.
-        // Combinacion del map y el filter
+/**
+ * Tiene un metodo emit, para enviar el objeto transformado,
+ * la combinacion entre el map y el filter
+ */
+private fun transformOperator() {
+    runBlocking {
         println("---------------  TRANSFORM  -----------------")
         DataSource.getColorsFlow().transform {
             if (it.isPrimary) {
