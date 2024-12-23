@@ -1,10 +1,46 @@
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 
 fun main() {
-    singleOperator()
+    flatMapLatest()
 }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun flatMapConcat() {
+    runBlocking {
+        DataSource.getColorsFlow()
+            .flatMapConcat { color -> DataSource.getDetailColor(color) }
+            .collect { detail ->
+                println(detail)
+            }
+    }
+}
+
+
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun flatMapMerge() {
+    runBlocking {
+        DataSource.getColorsFlow()
+            .flatMapMerge { color -> DataSource.getDetailColor(color) }
+            .collect { detail ->
+                println(detail)
+            }
+    }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun flatMapLatest() {
+    runBlocking {
+        DataSource.getColorsFlow()
+            .flatMapLatest { color -> DataSource.getDetailColor(color) }
+            .collect { detail ->
+                println(detail)
+            }
+    }
+}
+
 
 /**
  * The `reduce` operator combines all the elements emitted by the flow into a single value
@@ -112,9 +148,21 @@ object DataSource {
 
     fun getColorsFlow(): Flow<Color> = flow {
         getListColors().forEach { color ->
-            delay(600)
+            delay(200)
             emit(color)
         }
+    }
+
+    fun getDetailColor(color: Color): Flow<String> = flow {
+        emit("--------------------------------")
+        emit("ID: ${color.id}")
+        delay(200)
+        emit("Name: ${color.name}")
+        delay(200)
+        emit("Hex: ${color.hexadecimal}")
+        delay(200)
+        emit("Is primary: ${color.isPrimary}")
+        delay(200)
     }
 }
 
