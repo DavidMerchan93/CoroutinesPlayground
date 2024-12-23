@@ -4,7 +4,27 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 
 fun main() {
-    combineOperator()
+    getFlowWithError()
+}
+
+private fun getFlowWithError() {
+    val flowError = flow {
+        emit(1)
+        delay(200)
+        emit(2)
+        delay(200)
+        emit(3)
+        delay(200)
+        throw IllegalStateException("Error en flow")
+    }
+
+    runBlocking {
+        flowError.catch { error ->
+            println("Ocurrio un error -> ${error.message}")
+        }.collect {
+            println("Valor emitido: $it")
+        }
+    }
 }
 
 private fun zipOperator() {
